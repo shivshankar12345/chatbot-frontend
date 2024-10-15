@@ -4,7 +4,7 @@ import { FaTachometerAlt, FaCogs, FaChartBar, FaSignOutAlt, FaQuestionCircle } f
 
 const AdminSidebar: React.FC = () => {
   return (
-    <div className="h-screen w-64 bg-gray-900 text-white flex flex-col shadow-lg transition-all duration-300">
+    <div className="h-[120%] w-64 bg-gray-900 text-white flex flex-col shadow-lg transition-all duration-300">
       {/* Logo Section */}
       <div className="p-6 text-center border-b border-gray-700">
         <h1 className="text-3xl font-bold tracking-wider">Chatbot Admin</h1>
