@@ -1,44 +1,36 @@
+// QuickOptions.tsx
 import React from 'react';
 
-interface QuickOptionsProps {
-    onOptionClick: (option: string) => void;
+interface Feature {
+  text: string;
+  emoji: string;
 }
 
-const QuickOptions: React.FC<QuickOptionsProps> = ({ onOptionClick }) => {
-    const options = [
-        {
-            title: 'Cart Information',
-            description: 'Get details about the items currently in your cart.',
-        },
-        {
-            title: 'Order Status',
-            description: 'Track the status of your existing orders.',
-        },
-        {
-            title: 'Offers',
-            description: 'Discover the latest offers and discounts available.',
-        },
-    ];
+interface QuickOptionsProps {
+  features: Feature[];
+  isDarkMode: boolean;
+}
 
-    return (
-        <div className="flex flex-col items-center bg-gray-100 p-4 rounded shadow-md mb-4 w-full">
-            <p className="text-gray-700 mb-4 text-lg font-semibold">What do you want to know?</p>
-
-            {/* Horizontal row layout with scroll */}
-            <div className="flex gap-4 w-full max-w-4xl overflow-x-auto">
-                {options.map((option, index) => (
-                    <div
-                        key={index}
-                        onClick={() => onOptionClick(option.title)}
-                        className="cursor-pointer min-w-[250px] p-4 bg-white shadow-lg rounded-lg hover:bg-indigo-50 transition duration-200 ease-in-out"
-                    >
-                        <h3 className="text-xl font-bold text-indigo-700">{option.title}</h3>
-                        <p className="text-gray-600 mt-2">{option.description}</p>
-                    </div>
-                ))}
-            </div>
+const QuickOptions: React.FC<QuickOptionsProps> = ({ features, isDarkMode }) => {
+  return (
+    <div className="grid grid-cols-4 gap-6 mt-8 px-4">
+      {features.map((feature, index) => (
+        <div
+          key={index}
+          className={`flex flex-col items-center p-6 rounded-xl border shadow-md transition transform hover:scale-105 ${
+            isDarkMode
+              ? 'bg-gray-800 text-white border-gray-600'
+              : 'bg-white border-gray-300 shadow-gray-300'
+          }`}
+        >
+          <div className="text-6xl">{feature.emoji}</div>
+          <p className="mt-2 text-center text-lg font-bold tracking-wide">
+            {feature.text}
+          </p>
         </div>
-    );
+      ))}
+    </div>
+  );
 };
 
 export default QuickOptions;

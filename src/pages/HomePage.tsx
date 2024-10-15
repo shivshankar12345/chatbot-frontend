@@ -1,4 +1,6 @@
+// Chatbot.tsx
 import React, { useState, useEffect } from 'react';
+import QuickOptions from '../components/QuickOptions'; // Importing the new component
 
 interface Message {
   sender: string;
@@ -11,7 +13,13 @@ const Chatbot: React.FC = () => {
   const [botResponse, setBotResponse] = useState<string>('');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
-  // Apply theme class to body on mount and theme toggle
+  const features = [
+    { text: 'Create a Cartoon Pet', emoji: '🐶' },
+    { text: 'What can ChatGPT Do?', emoji: '🤖' },
+    { text: 'Find a Photo’s Decade', emoji: '📸' },
+    { text: 'Write a Game Report', emoji: '📄' },
+  ];
+
   useEffect(() => {
     document.body.className = isDarkMode ? 'bg-gray-900' : 'bg-white';
   }, [isDarkMode]);
@@ -22,6 +30,7 @@ const Chatbot: React.FC = () => {
     const newMessage = { sender: 'User', text: userInput };
     setMessages((prev) => [...prev, newMessage]);
     setUserInput('');
+
     setTimeout(() => {
       const response = `Processing: ${userInput}`;
       setBotResponse(response);
@@ -48,7 +57,6 @@ const Chatbot: React.FC = () => {
         isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'
       }`}
     >
-      {/* Header Section */}
       <header
         className={`p-4 text-center shadow-lg rounded-t-xl transition duration-300 ${
           isDarkMode
@@ -63,11 +71,10 @@ const Chatbot: React.FC = () => {
             isDarkMode ? 'hover:bg-gray-700' : 'hover:scale-110 hover:bg-blue-300'
           }`}
         >
-          {isDarkMode ? '🌞' : '🌙'} {/* Sun and Moon emojis for theme toggle */}
+          {isDarkMode ? '🌞' : '🌙'}
         </button>
       </header>
 
-      {/* Centered Bot Response */}
       {botResponse && (
         <div className="mt-4 text-center">
           <div
@@ -80,29 +87,8 @@ const Chatbot: React.FC = () => {
         </div>
       )}
 
-      {/* Features Section */}
-      <div className="grid grid-cols-4 gap-6 mt-8 px-4">
-        {[
-          { text: 'Create a Cartoon Pet', emoji: '🐶' },
-          { text: 'What can ChatGPT Do?', emoji: '🤖' },
-          { text: 'Find a Photo’s Decade', emoji: '📸' },
-          { text: 'Write a Game Report', emoji: '📄' },
-        ].map((feature, index) => (
-          <div
-            key={index}
-            className={`flex flex-col items-center p-6 rounded-xl border shadow-md transition transform hover:scale-105 ${
-              isDarkMode ? 'bg-gray-800 text-white border-gray-600' : 'bg-white border-gray-300 shadow-gray-300'
-            }`}
-          >
-            <div className="text-6xl">{feature.emoji}</div>
-            <p className="mt-2 text-center text-lg font-bold tracking-wide">
-              {feature.text}
-            </p>
-          </div>
-        ))}
-      </div>
+     <QuickOptions features={features} isDarkMode={isDarkMode} />
 
-      {/* Chat Messages Section */}
       <div
         className={`flex-grow mt-6 p-6 rounded-lg shadow-inner overflow-y-auto space-y-4 ${
           isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
@@ -127,7 +113,6 @@ const Chatbot: React.FC = () => {
         ))}
       </div>
 
-      {/* Chat Input Section */}
       <div
         className={`flex items-center mt-4 p-4 border-t rounded-b-xl transition ${
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300 shadow-md'
@@ -144,9 +129,7 @@ const Chatbot: React.FC = () => {
         <button
           onClick={handleSendMessage}
           className={`ml-3 px-6 py-3 rounded-lg shadow-lg transition-transform duration-300 ${
-            isDarkMode
-              ? 'bg-blue-600 hover:bg-blue-700'
-              : 'bg-blue-400 hover:bg-blue-500'
+            isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-400 hover:bg-blue-500'
           } focus:outline-none`}
         >
           Send
@@ -157,5 +140,3 @@ const Chatbot: React.FC = () => {
 };
 
 export default Chatbot;
-
-
