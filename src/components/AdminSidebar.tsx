@@ -4,51 +4,51 @@ import { FaTachometerAlt, FaCogs, FaChartBar, FaSignOutAlt, FaQuestionCircle } f
 
 const AdminSidebar: React.FC = () => {
   return (
-    <div className="h-screen w-64 bg-gray-900 text-white flex flex-col shadow-lg transition-all duration-300">
+    <div className="h-[150%] w-64 bg-gray-900 text-white flex flex-col justify-between shadow-lg">
       {/* Logo Section */}
       <div className="p-6 text-center border-b border-gray-700">
         <h1 className="text-3xl font-bold tracking-wider">Chatbot Admin</h1>
       </div>
 
       {/* Navigation */}
-      <nav className="mt-10 flex-grow">
+      <nav className="flex-grow mt-10">
         <ul>
           {/* Business Link */}
-          <li className="flex items-center p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
-            <FaTachometerAlt className="mr-3 text-xl" />
-            <NavLink to="/admin/business" className={({ isActive }) => (isActive ? "text-blue-400 font-semibold" : "text-white")}>
+          <li className="p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
+            <NavLink to="/admin/business" className={({ isActive }) => (isActive ? "text-blue-400 font-semibold flex items-center" : "text-white flex items-center")}>
+              <FaTachometerAlt className="mr-3 text-xl" />
               Business
             </NavLink>
           </li>
-         
+
           {/* Question-Answer Link */}
-          <li className="flex items-center p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
-            <FaQuestionCircle className="mr-3 text-xl" />
-            <NavLink to="/admin/question-answers" className={({ isActive }) => (isActive ? "text-blue-400 font-semibold" : "text-white")}>
+          <li className="p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
+            <NavLink to="/admin/question-answers" className={({ isActive }) => (isActive ? "text-blue-400 font-semibold flex items-center" : "text-white flex items-center")}>
+              <FaQuestionCircle className="mr-3 text-xl" />
               Question-Answer
             </NavLink>
           </li>
-          
+
           {/* Settings Link */}
-          <li className="flex items-center p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
-            <FaCogs className="mr-3 text-xl" />
-            <NavLink to="/admin/settings" className={({ isActive }) => (isActive ? "text-blue-400 font-semibold" : "text-white")}>
+          <li className="p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
+            <NavLink to="/admin/settings" className={({ isActive }) => (isActive ? "text-blue-400 font-semibold flex items-center" : "text-white flex items-center")}>
+              <FaCogs className="mr-3 text-xl" />
               Settings
             </NavLink>
           </li>
 
           {/* Reports Link */}
-          <li className="flex items-center p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
-            <FaChartBar className="mr-3 text-xl" />
-            <NavLink to="/admin/reports" className={({ isActive }) => (isActive ? "text-blue-400 font-semibold" : "text-white")}>
+          <li className="p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
+            <NavLink to="/admin/reports" className={({ isActive }) => (isActive ? "text-blue-400 font-semibold flex items-center" : "text-white flex items-center")}>
+              <FaChartBar className="mr-3 text-xl" />
               Reports
             </NavLink>
           </li>
 
           {/* User Management Link */}
-          <li className="flex items-center p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
-            <FaSignOutAlt className="mr-3 text-xl" />
-            <NavLink to="/" className={({ isActive }) => (isActive ? "text-blue-400 font-semibold" : "text-white")}>
+          <li className="p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
+            <NavLink to="/" className={({ isActive }) => (isActive ? "text-blue-400 font-semibold flex items-center" : "text-white flex items-center")}>
+              <FaSignOutAlt className="mr-3 text-xl" />
               Go Back to Home
             </NavLink>
           </li>
@@ -64,3 +64,10 @@ const AdminSidebar: React.FC = () => {
 };
 
 export default AdminSidebar;
+
+
+
+
+
+
+
