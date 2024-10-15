@@ -5,7 +5,7 @@ interface Message {
   text: string;
 }
 
-const ChatbotWithThemes: React.FC = () => {
+const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState<string>('');
   const [botResponse, setBotResponse] = useState<string>('');
