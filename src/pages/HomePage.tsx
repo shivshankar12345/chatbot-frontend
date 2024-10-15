@@ -156,4 +156,6 @@ const ChatbotWithThemes: React.FC = () => {
   );
 };
 
-export default ChatbotWithThemes;
+export default Chatbot;
+
+
