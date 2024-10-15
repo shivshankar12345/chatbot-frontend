@@ -1,100 +1,121 @@
-import React, { useState, useRef, useEffect } from 'react';
-import QuickOptions from '../components/QuickOptions'; // Import the new QuickOptions component
+import React, { useState, useEffect, useRef } from 'react';
+import QuickOptions from '../components/QuickOptions'; // Importing the new component
+
+interface Message {
+  sender: string;
+  text: string;
+}
 
 const Chatbot: React.FC = () => {
-    const [userInput, setUserInput] = useState('');
-    const [messages, setMessages] = useState<{ sender: string; text: string }[]>([]); // For tracking conversation
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [userInput, setUserInput] = useState<string>('');
+  const [botResponse, setBotResponse] = useState<string>('');
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    const handleSendMessage = () => {
-        if (userInput.trim() !== '') {
-            setMessages([...messages, { sender: 'User', text: userInput }]); // Add user message to chat
-            setUserInput(''); // Clear input after sending the message
-        }
-        if (textareaRef.current) {
-            textareaRef.current.style.height = 'auto'; // Reset height when cleared
-        }
-    };
+  const features = [
+    { text: 'Create a Cartoon Pet', emoji: '🐶' },
+    { text: 'What can ChatGPT Do?', emoji: '🤖' },
+    { text: 'Find a Photo’s Decade', emoji: '📸' },
+    { text: 'Write a Game Report', emoji: '📄' },
+  ];
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setUserInput(e.target.value);
-        autoResizeTextarea();
-    };
+  // Apply theme class to body on mount and theme toggle
+  useEffect(() => {
+    document.body.className = isDarkMode ? 'bg-gray-900' : 'bg-white';
+  }, [isDarkMode]);
 
-    const autoResizeTextarea = () => {
-        if (textareaRef.current) {
-            textareaRef.current.style.height = 'auto'; // Reset the height
-            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Adjust to content
-        }
-    };
+  const handleSendMessage = () => {
+    if (!userInput.trim()) return;
 
-    useEffect(() => {
-        autoResizeTextarea(); // Ensure it auto-resizes on initial render
-    }, [userInput]);
+    const newMessage = { sender: 'User', text: userInput };
+    setMessages((prev) => [...prev, newMessage]);
+    setUserInput('');
 
-    const handleOptionClick = (option: string) => {
-        setMessages([...messages, { sender: 'Bot', text: `You selected: ${option}` }]); // Add bot response
-    };
+    // Reset height when cleared
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'; 
+    }
 
-    return (
-        <div className="flex flex-col h-screen w-screen bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500">
-            {/* Header */}
-            <header className="p-6 bg-indigo-700 text-white shadow-md">
-                <h1 className="text-2xl font-bold text-center">AI Chatbot</h1>
-            </header>
+    setTimeout(() => {
+      const response = `Processing: ${userInput}`;
+      setBotResponse(response);
 
-            {/* Message Display Area */}
-            <div className="flex-grow p-6 overflow-y-auto bg-white rounded shadow-lg m-4">
-                {messages.length === 0 ? (
-                    <p className="text-gray-500 italic text-center">
-                        Your conversation will appear here.
-                    </p>
-                ) : (
-                    <div>
-                        {messages.map((msg, index) => (
-                            <p
-                                key={index}
-                                className={`text-sm p-2 my-1 rounded-lg ${
-                                    msg.sender === 'User'
-                                        ? 'bg-blue-100 text-right'
-                                        : 'bg-gray-100 text-left'
-                                }`}
-                            >
-                                {msg.text}
-                            </p>
-                        ))}
-                    </div>
-                )}
+      setTimeout(() => {
+        setBotResponse('');
+        const botMessage = { sender: 'Chatbot', text: `You said: ${userInput}` };
+        setMessages((prev) => [...prev, botMessage]);
+      }, 2000);
+    }, 500);
+  };
 
-                {/* Render QuickOptions at the start of the conversation */}
-                {messages.length === 0 && <QuickOptions onOptionClick={handleOptionClick} />}
-            </div>
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setUserInput(e.target.value);
+    autoResizeTextarea();
+  };
 
-            {/* Input Area */}
-            <div className="p-4 bg-white border-t border-gray-300 shadow-inner">
-                <div className="flex w-full max-w-2xl mx-auto"> {/* Center the input area */}
-                    <textarea
-                        ref={textareaRef}
-                        value={userInput}
-                        onChange={handleInputChange}
-                        onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                        placeholder="Type your message..."
-                        className="flex-grow px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:border-indigo-500 resize-none overflow-y-auto"
-                        rows={1} // Default height for the input field
-                        style={{ maxHeight: '150px', minHeight: '40px' }} // Maximum and minimum height
-                    />
-                    <button
-                        onClick={handleSendMessage}
-                        className="ml-2 px-6 py-2 h-12 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-md focus:outline-none"
-                    >
-                        Send
-                    </button>
-                </div>
-            </div>
+  const autoResizeTextarea = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'; // Reset the height
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Adjust to content
+    }
+  };
+
+  useEffect(() => {
+    autoResizeTextarea(); // Ensure it auto-resizes on initial render
+  }, [userInput]);
+
+  const toggleTheme = () => {
+    setIsDarkMode((prev) => !prev);
+  };
+
+  return (
+    <div className={`flex flex-col h-screen w-screen transition-all ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
+      <header className={`p-4 text-center shadow-lg rounded-t-xl transition duration-300 ${isDarkMode ? 'bg-gray-800 border-b border-gray-700' : 'bg-gradient-to-r from-green-400 to-blue-500 border-b border-blue-400'}`}>
+        <h1 className="text-3xl font-extrabold tracking-widest">CHATBOT</h1>
+        <button onClick={toggleTheme} className={`mt-2 p-2 rounded-full focus:outline-none transition-transform transform ${isDarkMode ? 'hover:bg-gray-700' : 'hover:scale-110 hover:bg-blue-300'}`}>
+          {isDarkMode ? '🌞' : '🌙'}
+        </button>
+      </header>
+
+      {/* Display Bot Response */}
+      {botResponse && (
+        <div className="mt-4 text-center">
+          <div className={`inline-block px-6 py-4 rounded-xl text-xl font-bold shadow-lg animate-pulse transition duration-300 ${isDarkMode ? 'bg-purple-700' : 'bg-yellow-300 border border-gray-300 shadow-gray-400'}`}>
+            {botResponse}
+          </div>
         </div>
-    );
+      )}
+
+      {/* QuickOptions Section */}
+      <QuickOptions features={features} isDarkMode={isDarkMode} onOptionClick={(option) => setMessages(prev => [...prev, { sender: 'Bot', text: `You selected: ${option}` }])} />
+
+      {/* Messages Display Area */}
+      <div className={`flex-grow mt-6 p-6 rounded-lg shadow-inner overflow-y-auto space-y-4 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+        {messages.map((message, index) => (
+          <div key={index} className={`p-4 rounded-lg max-w-lg border shadow-md transition-transform duration-300 ${message.sender === 'User' ? (isDarkMode ? 'bg-blue-600 text-white border-blue-500 shadow-gray-500' : 'bg-blue-400 text-white border-blue-300 shadow-gray-300') : (isDarkMode ? 'bg-purple-500 text-black border-purple-400 shadow-gray-500' : 'bg-purple-200 text-black border-purple-300 shadow-gray-200')}`}>
+            <span className="block text-sm font-medium">{message.sender}</span>
+            <p className="mt-2">{message.text}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Input Area */}
+      <div className={`flex items-center mt-4 p-4 border-t rounded-b-xl transition ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300 shadow-md'}`}>
+        <textarea
+          ref={textareaRef}
+          value={userInput}
+          onChange={handleInputChange}
+          placeholder="Type your message..."
+          className={`flex-grow p-3 rounded-lg resize-none transition focus:outline-none ${isDarkMode ? 'bg-gray-700 text-white border border-gray-600' : 'bg-gray-100 text-gray-800 border border-gray-300'}`}
+          style={{ maxHeight: '150px', minHeight: '40px' }} // Maximum and minimum height
+        />
+        <button onClick={handleSendMessage} className={`ml-3 px-6 py-3 rounded-lg shadow-lg transition-transform duration-300 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-400 hover:bg-blue-500'} focus:outline-none`}>
+          Send
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default Chatbot;
-
-
