@@ -109,7 +109,7 @@ const Chatbot: React.FC = () => {
             {isDarkMode ? "🌞" : "🌙"}
           </button>
           <button
-            onClick={() => navigate("/admin")}
+            onClick={() => navigate("/admin/question-answers")}
             className={`px-4 py-2 rounded-full border-2 transition duration-300 ${
               isDarkMode
                 ? "border-gray-600 bg-gray-800 text-white hover:bg-gray-700"

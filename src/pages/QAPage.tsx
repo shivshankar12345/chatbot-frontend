@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { FaPlus, FaSave, FaSun, FaMoon } from "react-icons/fa";
+import { FaSave, FaSun, FaMoon } from "react-icons/fa";
 import { addBotConfiguration } from "../apis/chatApis";
+import { useNavigate } from "react-router-dom";
 
 interface ConversationNode {
   question: string;
@@ -14,6 +15,7 @@ interface Business {
 }
 
 const ChatbotQAAdmin: React.FC = () => {
+  const navigate = useNavigate();
   const [businesses, setBusinesses] = useState<Business[]>([
     { name: "", conversationTree: { question: "", options: {} } },
   ]);
@@ -85,12 +87,7 @@ const ChatbotQAAdmin: React.FC = () => {
     setBusinesses(updatedBusinesses);
   };
 
-  const addNewBusiness = () => {
-    setBusinesses([
-      ...businesses,
-      { name: "", conversationTree: { question: "", options: {} } },
-    ]);
-  };
+
 
   const handleSave = async () => {
     await addBotConfiguration(businesses)
@@ -105,18 +102,26 @@ const ChatbotQAAdmin: React.FC = () => {
 
   return (
     <div
-      className={`p-6 max-w-2xl mx-auto ${
+      className={`p-6 max-w-2xl mx-auto rounded-lg shadow-lg transition-all ${
         isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-800"
       }`}
     >
-      <h1 className="text-3xl font-bold mb-6">Chatbot Q&A Admin</h1>
-      <button
-        onClick={toggleDarkMode}
-        className="mb-4 px-4 py-2 bg-gray-500 text-white rounded-md flex items-center"
-      >
-        {isDarkMode ? <FaSun className="mr-2" /> : <FaMoon className="mr-2" />}
-        Toggle {isDarkMode ? "Light" : "Dark"} Mode
-      </button>
+      <h1 className="text-3xl font-bold mb-6 text-center">Chatbot Q&A Admin</h1>
+      <div className="flex justify-between mb-4">
+        <button
+          onClick={() => navigate("/")}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+        >
+          Go To Home
+        </button>
+        <button
+          onClick={toggleDarkMode}
+          className="px-4 py-2 bg-gray-500 text-white rounded-md flex items-center hover:bg-gray-600 transition"
+        >
+          {isDarkMode ? <FaSun className="mr-2" /> : <FaMoon className="mr-2" />}
+          Toggle {isDarkMode ? "Light" : "Dark"} Mode
+        </button>
+      </div>
 
       {businesses.map((business, businessIndex) => (
         <div
@@ -133,7 +138,7 @@ const ChatbotQAAdmin: React.FC = () => {
               onChange={(e) =>
                 handleBusinessChange(businessIndex, e.target.value)
               }
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter Business Name"
             />
           </div>
@@ -151,20 +156,16 @@ const ChatbotQAAdmin: React.FC = () => {
         </div>
       ))}
 
-      <button
-        onClick={addNewBusiness}
-        className="mt-4 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition flex items-center"
-      >
-        <FaPlus className="mr-1" /> Add Business
-      </button>
-
-      {/* Save Button */}
-      <button
-        onClick={handleSave}
-        className="mt-4 ml-4 px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition flex items-center"
-      >
-        <FaSave className="mr-1" /> Save All
-      </button>
+      <div className="flex justify-between mt-4">
+       
+        {/* Save Button */}
+        <button
+          onClick={handleSave}
+          className="mt-4 px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition flex items-center"
+        >
+          <FaSave className="mr-1" /> Save All
+        </button>
+      </div>
     </div>
   );
 };
@@ -225,7 +226,7 @@ const ConversationNodeComponent: React.FC<ConversationNodeProps> = ({
         type="text"
         value={node.question}
         onChange={(e) => onQuestionChange(businessIndex, path, e.target.value)}
-        className="w-full p-2 border rounded-md mb-4"
+        className="w-full p-2 border rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
         placeholder="Enter Question"
       />
 
@@ -234,7 +235,7 @@ const ConversationNodeComponent: React.FC<ConversationNodeProps> = ({
         type="text"
         value={node.answer}
         onChange={(e) => onAnswerChange(businessIndex, path, e.target.value)}
-        className="w-full p-2 border rounded-md mb-4"
+        className="w-full p-2 border rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
         placeholder="Enter Answer"
       />
 
@@ -246,7 +247,7 @@ const ConversationNodeComponent: React.FC<ConversationNodeProps> = ({
           onChange={(e) => setOptionLabel1(e.target.value)}
           className={`flex-1 p-2 border rounded-md mr-2 ${
             isFirstOptionDisabled ? "bg-gray-300 cursor-not-allowed" : ""
-          }`}
+          } focus:outline-none focus:ring-2 focus:ring-blue-500`}
           placeholder="Enter Option Label 1"
           disabled={isFirstOptionDisabled} // Disable if first option is disabled
         />
@@ -254,7 +255,7 @@ const ConversationNodeComponent: React.FC<ConversationNodeProps> = ({
           type="text"
           value={optionLabel2}
           onChange={(e) => setOptionLabel2(e.target.value)}
-          className="flex-1 p-2 border rounded-md mr-2"
+          className="flex-1 p-2 border rounded-md mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Enter Option Label 2"
         />
         <button
