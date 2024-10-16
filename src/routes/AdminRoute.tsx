@@ -4,7 +4,7 @@ import AdminLayout from "../layout/AdminLayout";
 import BusinessList from "../pages/BusinessList";
 import BusinessPage from "../pages/BusinessPage";
 import QAPage from "../pages/QAPage";
-import Settings from "../pages/settings";
+import Settings from "../pages/Settings";
 import Reports from "../pages/Reports";
 
 const AdminRoutes: React.FC = () => {
