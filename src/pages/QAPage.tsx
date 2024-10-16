@@ -87,8 +87,6 @@ const ChatbotQAAdmin: React.FC = () => {
     setBusinesses(updatedBusinesses);
   };
 
-
-
   const handleSave = async () => {
     await addBotConfiguration(businesses)
       .then((data) => {
@@ -102,7 +100,7 @@ const ChatbotQAAdmin: React.FC = () => {
 
   return (
     <div
-      className={`p-6 max-w-2xl mx-auto rounded-lg shadow-lg transition-all ${
+      className={`p-6 rounded-lg shadow-lg transition-all w-full h-full ${
         isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-800"
       }`}
     >
@@ -110,15 +108,19 @@ const ChatbotQAAdmin: React.FC = () => {
       <div className="flex justify-between mb-4">
         <button
           onClick={() => navigate("/")}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+          className="px-3 py-2 border border-blue-500 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200"
         >
           Go To Home
         </button>
         <button
           onClick={toggleDarkMode}
-          className="px-4 py-2 bg-gray-500 text-white rounded-md flex items-center hover:bg-gray-600 transition"
+          className="px-3 py-2 border border-gray-500 bg-gray-500 text-white rounded-md flex items-center hover:bg-gray-600 transition duration-200"
         >
-          {isDarkMode ? <FaSun className="mr-2" /> : <FaMoon className="mr-2" />}
+          {isDarkMode ? (
+            <FaSun className="mr-2" />
+          ) : (
+            <FaMoon className="mr-2" />
+          )}
           Toggle {isDarkMode ? "Light" : "Dark"} Mode
         </button>
       </div>
@@ -155,13 +157,11 @@ const ChatbotQAAdmin: React.FC = () => {
           />
         </div>
       ))}
-
       <div className="flex justify-between mt-4">
-       
         {/* Save Button */}
         <button
           onClick={handleSave}
-          className="mt-4 px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition flex items-center"
+          className="px-3 py-2 border border-purple-500 bg-purple-500 text-white rounded-md flex items-center hover:bg-purple-600 transition duration-200"
         >
           <FaSave className="mr-1" /> Save All
         </button>
@@ -245,7 +245,7 @@ const ConversationNodeComponent: React.FC<ConversationNodeProps> = ({
           type="text"
           value={optionLabel1}
           onChange={(e) => setOptionLabel1(e.target.value)}
-          className={`flex-1 p-2 border rounded-md mr-2 ${
+          className={`w-full p-2 border rounded-md mr-2 ${
             isFirstOptionDisabled ? "bg-gray-300 cursor-not-allowed" : ""
           } focus:outline-none focus:ring-2 focus:ring-blue-500`}
           placeholder="Enter Option Label 1"
@@ -255,7 +255,7 @@ const ConversationNodeComponent: React.FC<ConversationNodeProps> = ({
           type="text"
           value={optionLabel2}
           onChange={(e) => setOptionLabel2(e.target.value)}
-          className="flex-1 p-2 border rounded-md mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-2 border rounded-md mr-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Enter Option Label 2"
         />
         <button
