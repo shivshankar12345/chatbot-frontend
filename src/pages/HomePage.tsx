@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import QuickOptions from "../components/QuickOptions"; // Ensure you have this component
 import { dummyConversationTree } from "../config/config";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +21,7 @@ const dummyBusiness = {
   conversationTree: dummyConversationTree,
 };
 
+
 const Chatbot: React.FC = () => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -28,14 +29,15 @@ const Chatbot: React.FC = () => {
     dummyBusiness.conversationTree
   );
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
-
+  const messageEndRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    // Initialize conversation with the first question
     setMessages([
       { sender: "Chatbot", text: dummyBusiness.conversationTree.question },
     ]);
   }, []);
-
+   useEffect(()=>{
+    messageEndRef.current?.scrollIntoView({behavior:"smooth"})
+   },[messages]);
   const handleOptionClick = (optionKey: string) => {
     const selectedOption = currentNode.options[optionKey];
 
@@ -121,7 +123,7 @@ const Chatbot: React.FC = () => {
         </div>
       </header>
 
-      <div className="flex-grow mt-6 p-6 rounded-lg shadow-inner overflow-y-auto space-y-4">
+      <div className="flex-grow mt-6 p-6 rounded-lg shadow-inner overflow-y-auto space-y-4" id="messageContainer">
         {messages.map((message, index) => (
           <div
             key={index}
@@ -133,6 +135,7 @@ const Chatbot: React.FC = () => {
             <p className="mt-2">{message.text}</p>
           </div>
         ))}
+        <div ref={messageEndRef}></div>
       </div>
 
       {/* QuickOptions Section */}
