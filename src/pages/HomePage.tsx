@@ -1,119 +1,122 @@
-import React, { useState, useEffect, useRef } from 'react';
-import QuickOptions from '../components/QuickOptions'; // Importing the new component
+import React, { useState, useEffect } from "react";
+import QuickOptions from "../components/QuickOptions"; // Ensure you have this component
+import { dummyConversationTree } from "../config/config";
 
 interface Message {
   sender: string;
   text: string;
 }
 
+export interface ConversationNode {
+  question: string;
+  answer: string; // Added answer field
+  options: {
+    [key: string]: ConversationNode;
+  };
+}
+
+const dummyBusiness = {
+  name: "My Business",
+  conversationTree: dummyConversationTree,
+};
+
 const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [userInput, setUserInput] = useState<string>('');
-  const [botResponse, setBotResponse] = useState<string>('');
+  const [currentNode, setCurrentNode] = useState(
+    dummyBusiness.conversationTree
+  );
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const features = [
-    { text: 'Create a Cartoon Pet', emoji: '🐶' },
-    { text: 'What can ChatGPT Do?', emoji: '🤖' },
-    { text: 'Find a Photo’s Decade', emoji: '📸' },
-    { text: 'Write a Game Report', emoji: '📄' },
-  ];
-
-  // Apply theme class to body on mount and theme toggle
-  useEffect(() => {
-    document.body.className = isDarkMode ? 'bg-gray-900' : 'bg-white';
-  }, [isDarkMode]);
-
-  const handleSendMessage = () => {
-    if (!userInput.trim()) return;
-
-    const newMessage = { sender: 'User', text: userInput };
-    setMessages((prev) => [...prev, newMessage]);
-    setUserInput('');
-
-    // Reset height when cleared
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'; 
-    }
-
-    setTimeout(() => {
-      const response = `Processing: ${userInput}`;
-      setBotResponse(response);
-
-      setTimeout(() => {
-        setBotResponse('');
-        const botMessage = { sender: 'Chatbot', text: `You said: ${userInput}` };
-        setMessages((prev) => [...prev, botMessage]);
-      }, 2000);
-    }, 500);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setUserInput(e.target.value);
-    autoResizeTextarea();
-  };
-
-  const autoResizeTextarea = () => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'; // Reset the height
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Adjust to content
-    }
-  };
 
   useEffect(() => {
-    autoResizeTextarea(); // Ensure it auto-resizes on initial render
-  }, [userInput]);
+    // Initialize conversation with the first question
+    setMessages([
+      { sender: "Chatbot", text: dummyBusiness.conversationTree.question },
+    ]);
+  }, []);
 
-  const toggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
+  const handleOptionClick = (optionKey: string) => {
+    const selectedOption = currentNode.options[optionKey];
+
+    if (selectedOption) {
+      // Add the user's selection
+      setMessages((prev) => [
+        ...prev,
+        { sender: "User", text: selectedOption.question },
+      ]);
+
+      // Add the bot's answer for the selected option
+      setMessages((prev) => [
+        ...prev,
+        { sender: "Chatbot", text: selectedOption.answer },
+      ]);
+
+      // If the selected option has further questions, present the next one
+      const nextOptionKeys = Object.keys(selectedOption.options);
+      if (nextOptionKeys.length > 0) {
+        const nextQuestion = selectedOption.options[nextOptionKeys[0]].question;
+        setMessages((prev) => [
+          ...prev,
+          { sender: "Chatbot", text: nextQuestion },
+        ]);
+        // Update the current node to the selected option
+        setCurrentNode(selectedOption);
+      } else {
+        // If no more options are left, go back to the start
+        alert("No more options available. Returning to the start...");
+        setCurrentNode(dummyBusiness.conversationTree);
+        setMessages([
+          { sender: "Chatbot", text: dummyBusiness.conversationTree.question },
+        ]);
+      }
+    } else {
+      // If no more options are left, go back to the start
+      alert("No more options available. Returning to the start...");
+      setCurrentNode(dummyBusiness.conversationTree);
+      setMessages([
+        { sender: "Chatbot", text: dummyBusiness.conversationTree.question },
+      ]);
+    }
   };
 
   return (
-    <div className={`flex flex-col h-screen w-screen transition-all ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
-      <header className={`p-4 text-center shadow-lg rounded-t-xl transition duration-300 ${isDarkMode ? 'bg-gray-800 border-b border-gray-700' : 'bg-gradient-to-r from-green-400 to-blue-500 border-b border-blue-400'}`}>
-        <h1 className="text-3xl font-extrabold tracking-widest">CHATBOT</h1>
-        <button onClick={toggleTheme} className={`mt-2 p-2 rounded-full focus:outline-none transition-transform transform ${isDarkMode ? 'hover:bg-gray-700' : 'hover:scale-110 hover:bg-blue-300'}`}>
-          {isDarkMode ? '🌞' : '🌙'}
+    <div
+      className={`flex flex-col h-screen w-screen transition-all ${
+        isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-800"
+      }`}
+    >
+      <header className="flex justify-between items-center p-4 border-b border-gray-300">
+        <h1 className="text-xl font-bold">{dummyBusiness.name}</h1>
+        <button
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+          onClick={() => setIsDarkMode((prev) => !prev)}
+        >
+          Toggle Dark Mode
         </button>
       </header>
 
-      {/* Display Bot Response */}
-      {botResponse && (
-        <div className="mt-4 text-center">
-          <div className={`inline-block px-6 py-4 rounded-xl text-xl font-bold shadow-lg animate-pulse transition duration-300 ${isDarkMode ? 'bg-purple-700' : 'bg-yellow-300 border border-gray-300 shadow-gray-400'}`}>
-            {botResponse}
-          </div>
-        </div>
-      )}
-
-      {/* QuickOptions Section */}
-      <QuickOptions features={features} isDarkMode={isDarkMode} onOptionClick={(option) => setMessages(prev => [...prev, { sender: 'Bot', text: `You selected: ${option}` }])} />
-
-      {/* Messages Display Area */}
-      <div className={`flex-grow mt-6 p-6 rounded-lg shadow-inner overflow-y-auto space-y-4 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+      <div className="flex-grow mt-6 p-6 rounded-lg shadow-inner overflow-y-auto space-y-4">
         {messages.map((message, index) => (
-          <div key={index} className={`p-4 rounded-lg max-w-lg border shadow-md transition-transform duration-300 ${message.sender === 'User' ? (isDarkMode ? 'bg-blue-600 text-white border-blue-500 shadow-gray-500' : 'bg-blue-400 text-white border-blue-300 shadow-gray-300') : (isDarkMode ? 'bg-purple-500 text-black border-purple-400 shadow-gray-500' : 'bg-purple-200 text-black border-purple-300 shadow-gray-200')}`}>
+          <div
+            key={index}
+            className={`p-2 rounded-lg ${
+              message.sender === "Chatbot" ? "bg-gray-200" : "bg-blue-100"
+            }`}
+          >
             <span className="block text-sm font-medium">{message.sender}</span>
             <p className="mt-2">{message.text}</p>
           </div>
         ))}
       </div>
 
-      {/* Input Area */}
-      <div className={`flex items-center mt-4 p-4 border-t rounded-b-xl transition ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-300 shadow-md'}`}>
-        <textarea
-          ref={textareaRef}
-          value={userInput}
-          onChange={handleInputChange}
-          placeholder="Type your message..."
-          className={`flex-grow p-3 rounded-lg resize-none transition focus:outline-none ${isDarkMode ? 'bg-gray-700 text-white border border-gray-600' : 'bg-gray-100 text-gray-800 border border-gray-300'}`}
-          style={{ maxHeight: '150px', minHeight: '40px' }} // Maximum and minimum height
-        />
-        <button onClick={handleSendMessage} className={`ml-3 px-6 py-3 rounded-lg shadow-lg transition-transform duration-300 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-400 hover:bg-blue-500'} focus:outline-none`}>
-          Send
-        </button>
-      </div>
+      {/* QuickOptions Section */}
+      <QuickOptions
+        features={Object.keys(currentNode.options).map((key) => ({
+          id: key,
+          text: currentNode.options[key].question,
+        }))}
+        isDarkMode={isDarkMode}
+        onOptionClick={handleOptionClick}
+      />
     </div>
   );
 };

@@ -1,141 +1,143 @@
-import React, { useState } from 'react';
-import { FaPlus, FaTrash, FaSave, FaEdit, FaSun, FaMoon } from 'react-icons/fa';
+import React, { useState } from "react";
+import { FaPlus, FaSave, FaSun, FaMoon } from "react-icons/fa";
+import { addBotConfiguration } from "../apis/chatApis";
 
-interface QAItem {
+interface ConversationNode {
   question: string;
-  answer: string;
+  answer?: string; // Optional since it could be dynamic
+  options: { [key: string]: ConversationNode }; // Tree structure for options leading to other nodes
 }
 
 interface Business {
   name: string;
-  qaList: QAItem[];
+  conversationTree: ConversationNode;
 }
 
 const ChatbotQAAdmin: React.FC = () => {
   const [businesses, setBusinesses] = useState<Business[]>([
-    { name: '', qaList: [{ question: '', answer: '' }] },
+    { name: "", conversationTree: { question: "", options: {} } },
   ]);
+
+  // console.log("Business", businesses);
+
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  // Handle Changes in Individual Inputs
+  // Handle Business Name Change
   const handleBusinessChange = (index: number, value: string) => {
     const updatedBusinesses = [...businesses];
     updatedBusinesses[index].name = value;
     setBusinesses(updatedBusinesses);
   };
 
-  const handleInputChange = (
+  // Handle Question Change
+  const handleQuestionChange = (
     businessIndex: number,
-    qaIndex: number,
-    field: 'question' | 'answer',
+    questionPath: string[],
     value: string
   ) => {
     const updatedBusinesses = [...businesses];
-    updatedBusinesses[businessIndex].qaList[qaIndex][field] = value;
+    let currentNode = updatedBusinesses[businessIndex].conversationTree;
+
+    questionPath.forEach((step) => {
+      currentNode = currentNode.options[step]; // Traverse to the current node based on the path
+    });
+
+    currentNode.question = value; // Update the question at the current node
     setBusinesses(updatedBusinesses);
   };
 
-  // Add New Question-Answer Pair
-  const addNewQA = (businessIndex: number) => {
+  // Handle Adding Option for a Question
+  const addOptionToQuestion = (
+    businessIndex: number,
+    questionPath: string[],
+    optionLabel: string
+  ) => {
     const updatedBusinesses = [...businesses];
-    updatedBusinesses[businessIndex].qaList.push({ question: '', answer: '' });
+    let currentNode = updatedBusinesses[businessIndex].conversationTree;
+
+    questionPath.forEach((step) => {
+      currentNode = currentNode.options[step]; // Traverse to the current node based on the path
+    });
+
+    if (!currentNode.options[optionLabel]) {
+      currentNode.options[optionLabel] = { question: "", options: {} }; // Add a new node for this option
+    }
+
     setBusinesses(updatedBusinesses);
   };
 
-  // Remove a Question-Answer Pair
-  const removeQA = (businessIndex: number, qaIndex: number) => {
-    const updatedBusinesses = [...businesses];
-    updatedBusinesses[businessIndex].qaList.splice(qaIndex, 1);
-    setBusinesses(updatedBusinesses);
-  };
-
-  // Add New Business
+  // Add a New Business
   const addNewBusiness = () => {
-    setBusinesses([...businesses, { name: '', qaList: [{ question: '', answer: '' }] }]);
+    setBusinesses([
+      ...businesses,
+      { name: "", conversationTree: { question: "", options: {} } },
+    ]);
   };
 
   // Handle Save Action
-  const handleSave = () => {
-    console.log('Saved Businesses:', businesses);
-    alert('Businesses and Q&A saved successfully!');
+  const handleSave = async () => {
+    console.log("Business", businesses);
+    console.log("Saved Businesses:", businesses);
+    // You can send the `businesses` data to your backend here
+    // For example, using fetch:
+    await addBotConfiguration(businesses)
+      .then((data) => {
+        console.log("Data", data);
+        location.reload();
+      })
+      .catch((error) => {
+        console.error("Error saving data:", error);
+      });
   };
 
   return (
-    <div className={`p-6 max-w-2xl mx-auto ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'}`}>
+    <div
+      className={`p-6 max-w-2xl mx-auto ${
+        isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-800"
+      }`}
+    >
       <h1 className="text-3xl font-bold mb-6">Chatbot Q&A Admin</h1>
-      <button onClick={toggleDarkMode} className="mb-4 px-4 py-2 bg-gray-500 text-white rounded-md flex items-center">
+      <button
+        onClick={toggleDarkMode}
+        className="mb-4 px-4 py-2 bg-gray-500 text-white rounded-md flex items-center"
+      >
         {isDarkMode ? <FaSun className="mr-2" /> : <FaMoon className="mr-2" />}
-        Toggle {isDarkMode ? 'Light' : 'Dark'} Mode
+        Toggle {isDarkMode ? "Light" : "Dark"} Mode
       </button>
 
       {businesses.map((business, businessIndex) => (
-        <div key={businessIndex} className="mb-6 border p-4 rounded-md shadow-md bg-gray-100">
+        <div
+          key={businessIndex}
+          className={`mb-6 border p-4 rounded-md shadow-md ${
+            isDarkMode ? "bg-gray-700" : "bg-gray-100"
+          }`}
+        >
           <div className="mb-4">
             <label className="block font-bold mb-1">Business Name:</label>
             <input
               type="text"
               value={business.name}
-              onChange={(e) => handleBusinessChange(businessIndex, e.target.value)}
+              onChange={(e) =>
+                handleBusinessChange(businessIndex, e.target.value)
+              }
               className="w-full p-2 border rounded-md"
               placeholder="Enter Business Name"
             />
           </div>
 
-          {business.qaList.map((qa, qaIndex) => (
-            <div key={qaIndex} className="mb-4 border p-4 rounded-md bg-gray-200 shadow-sm">
-              <div className="flex justify-between mb-2">
-                <div className="flex-grow mr-2">
-                  <label className="block font-bold mb-1">Question {qaIndex + 1}:</label>
-                  <input
-                    type="text"
-                    value={qa.question}
-                    onChange={(e) => handleInputChange(businessIndex, qaIndex, 'question', e.target.value)}
-                    className="w-full p-2 border rounded-md"
-                    placeholder="Enter Question"
-                  />
-                </div>
-                <div className="flex-grow ml-2">
-                  <label className="block font-bold mb-1">Answer {qaIndex + 1}:</label>
-                  <input
-                    type="text"
-                    value={qa.answer}
-                    onChange={(e) => handleInputChange(businessIndex, qaIndex, 'answer', e.target.value)}
-                    className="w-full p-2 border rounded-md"
-                    placeholder="Enter Answer"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <button
-                  onClick={() => removeQA(businessIndex, qaIndex)}
-                  className="mt-2 px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
-                  disabled={business.qaList.length === 1} // Disable if only one pair left
-                >
-                  <FaTrash className="mr-1" /> Remove
-                </button>
-                <button
-                  onClick={() => {
-                    // Edit logic can be implemented here if needed
-                  }}
-                  className="mt-2 ml-2 px-2 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition"
-                >
-                  <FaEdit className="mr-1" /> Edit
-                </button>
-              </div>
-            </div>
-          ))}
-
-          <button
-            onClick={() => addNewQA(businessIndex)}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition flex items-center"
-          >
-            <FaPlus className="mr-1" /> Add Question
-          </button>
+          {/* Render the conversation tree */}
+          <ConversationNodeComponent
+            businessIndex={businessIndex}
+            node={business.conversationTree}
+            onQuestionChange={handleQuestionChange}
+            addOption={addOptionToQuestion}
+            path={[]} // Starting path
+            isDarkMode={isDarkMode}
+          />
         </div>
       ))}
 
@@ -152,6 +154,100 @@ const ChatbotQAAdmin: React.FC = () => {
         className="mt-4 ml-4 px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition flex items-center"
       >
         <FaSave className="mr-1" /> Save All
+      </button>
+    </div>
+  );
+};
+
+// Component to handle rendering of each conversation node recursively
+interface ConversationNodeProps {
+  businessIndex: number;
+  node: ConversationNode;
+  onQuestionChange: (
+    businessIndex: number,
+    questionPath: string[],
+    value: string
+  ) => void;
+  addOption: (
+    businessIndex: number,
+    questionPath: string[],
+    optionLabel: string
+  ) => void;
+  path: string[]; // Path to this node in the tree
+  isDarkMode: boolean; // Pass dark mode to apply to nested components
+}
+
+const ConversationNodeComponent: React.FC<ConversationNodeProps> = ({
+  businessIndex,
+  node,
+  onQuestionChange,
+  addOption,
+  path,
+  isDarkMode,
+}) => {
+  const [option1, setOption1] = useState(""); // For the first option
+  const [option2, setOption2] = useState(""); // For the second option
+
+  const handleAddOptions = () => {
+    if (option1) addOption(businessIndex, path, option1);
+    if (option2) addOption(businessIndex, path, option2);
+    setOption1(""); // Clear the input after adding
+    setOption2(""); // Clear the input after adding
+  };
+
+  return (
+    <div
+      className={`mb-4 border p-4 rounded-md shadow-sm ${
+        isDarkMode ? "bg-gray-600" : "bg-gray-200"
+      }`}
+    >
+      <label className="block font-bold mb-1">Question:</label>
+      <input
+        type="text"
+        value={node.question}
+        onChange={(e) => onQuestionChange(businessIndex, path, e.target.value)}
+        className="w-full p-2 border rounded-md mb-4"
+        placeholder="Enter Question"
+      />
+
+      <label className="block font-bold mb-1">Options:</label>
+      {Object.keys(node.options).map((optionLabel) => (
+        <div key={optionLabel} className="mb-2">
+          <span className="font-semibold">{optionLabel}</span>
+          <ConversationNodeComponent
+            businessIndex={businessIndex}
+            node={node.options[optionLabel]}
+            onQuestionChange={onQuestionChange}
+            addOption={addOption}
+            path={[...path, optionLabel]} // Append the optionLabel to the path
+            isDarkMode={isDarkMode} // Pass dark mode to nested nodes
+          />
+        </div>
+      ))}
+
+      <div className="mb-4">
+        <label className="block font-bold mb-1">Add Options:</label>
+        <input
+          type="text"
+          value={option1}
+          onChange={(e) => setOption1(e.target.value)}
+          className="w-full p-2 border rounded-md mb-2"
+          placeholder="Option 1"
+        />
+        <input
+          type="text"
+          value={option2}
+          onChange={(e) => setOption2(e.target.value)}
+          className="w-full p-2 border rounded-md mb-2"
+          placeholder="Option 2"
+        />
+      </div>
+
+      <button
+        onClick={handleAddOptions}
+        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition flex items-center"
+      >
+        <FaPlus className="mr-1" /> Add Options
       </button>
     </div>
   );
