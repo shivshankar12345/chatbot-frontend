@@ -18,22 +18,18 @@ const ChatbotQAAdmin: React.FC = () => {
     { name: "", conversationTree: { question: "", options: {} } },
   ]);
 
-  // console.log("Business", businesses);
-
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  // Handle Business Name Change
   const handleBusinessChange = (index: number, value: string) => {
     const updatedBusinesses = [...businesses];
     updatedBusinesses[index].name = value;
     setBusinesses(updatedBusinesses);
   };
 
-  // Handle Question Change
   const handleQuestionChange = (
     businessIndex: number,
     questionPath: string[],
@@ -43,14 +39,29 @@ const ChatbotQAAdmin: React.FC = () => {
     let currentNode = updatedBusinesses[businessIndex].conversationTree;
 
     questionPath.forEach((step) => {
-      currentNode = currentNode.options[step]; // Traverse to the current node based on the path
+      currentNode = currentNode.options[step];
     });
 
-    currentNode.question = value; // Update the question at the current node
+    currentNode.question = value;
     setBusinesses(updatedBusinesses);
   };
 
-  // Handle Adding Option for a Question
+  const handleAnswerChange = (
+    businessIndex: number,
+    questionPath: string[],
+    value: string
+  ) => {
+    const updatedBusinesses = [...businesses];
+    let currentNode = updatedBusinesses[businessIndex].conversationTree;
+
+    questionPath.forEach((step) => {
+      currentNode = currentNode.options[step];
+    });
+
+    currentNode.answer = value;
+    setBusinesses(updatedBusinesses);
+  };
+
   const addOptionToQuestion = (
     businessIndex: number,
     questionPath: string[],
@@ -60,17 +71,20 @@ const ChatbotQAAdmin: React.FC = () => {
     let currentNode = updatedBusinesses[businessIndex].conversationTree;
 
     questionPath.forEach((step) => {
-      currentNode = currentNode.options[step]; // Traverse to the current node based on the path
+      currentNode = currentNode.options[step];
     });
 
     if (!currentNode.options[optionLabel]) {
-      currentNode.options[optionLabel] = { question: "", options: {} }; // Add a new node for this option
+      currentNode.options[optionLabel] = {
+        question: "",
+        answer: "",
+        options: {},
+      };
     }
 
     setBusinesses(updatedBusinesses);
   };
 
-  // Add a New Business
   const addNewBusiness = () => {
     setBusinesses([
       ...businesses,
@@ -78,12 +92,7 @@ const ChatbotQAAdmin: React.FC = () => {
     ]);
   };
 
-  // Handle Save Action
   const handleSave = async () => {
-    console.log("Business", businesses);
-    console.log("Saved Businesses:", businesses);
-    // You can send the `businesses` data to your backend here
-    // For example, using fetch:
     await addBotConfiguration(businesses)
       .then((data) => {
         console.log("Data", data);
@@ -134,6 +143,7 @@ const ChatbotQAAdmin: React.FC = () => {
             businessIndex={businessIndex}
             node={business.conversationTree}
             onQuestionChange={handleQuestionChange}
+            onAnswerChange={handleAnswerChange}
             addOption={addOptionToQuestion}
             path={[]} // Starting path
             isDarkMode={isDarkMode}
@@ -168,6 +178,11 @@ interface ConversationNodeProps {
     questionPath: string[],
     value: string
   ) => void;
+  onAnswerChange: (
+    businessIndex: number,
+    questionPath: string[],
+    value: string
+  ) => void;
   addOption: (
     businessIndex: number,
     questionPath: string[],
@@ -181,18 +196,21 @@ const ConversationNodeComponent: React.FC<ConversationNodeProps> = ({
   businessIndex,
   node,
   onQuestionChange,
+  onAnswerChange,
   addOption,
   path,
   isDarkMode,
 }) => {
-  const [option1, setOption1] = useState(""); // For the first option
-  const [option2, setOption2] = useState(""); // For the second option
+  const [optionLabel1, setOptionLabel1] = useState("");
+  const [optionLabel2, setOptionLabel2] = useState("");
+  const [isFirstOptionDisabled, setIsFirstOptionDisabled] = useState(false); // Track if first option is disabled
 
-  const handleAddOptions = () => {
-    if (option1) addOption(businessIndex, path, option1);
-    if (option2) addOption(businessIndex, path, option2);
-    setOption1(""); // Clear the input after adding
-    setOption2(""); // Clear the input after adding
+  const handleAddOption = (optionLabel: string) => {
+    if (optionLabel.trim() === "") return; // Prevent empty option labels
+    addOption(businessIndex, path, optionLabel); // Add new option
+    if (!isFirstOptionDisabled) {
+      setIsFirstOptionDisabled(true); // Disable the first option input after adding
+    }
   };
 
   return (
@@ -200,6 +218,7 @@ const ConversationNodeComponent: React.FC<ConversationNodeProps> = ({
       className={`mb-4 border p-4 rounded-md shadow-sm ${
         isDarkMode ? "bg-gray-600" : "bg-gray-200"
       }`}
+      style={{ marginLeft: path.length * 20 }} // Indent nested options
     >
       <label className="block font-bold mb-1">Question:</label>
       <input
@@ -210,45 +229,61 @@ const ConversationNodeComponent: React.FC<ConversationNodeProps> = ({
         placeholder="Enter Question"
       />
 
-      <label className="block font-bold mb-1">Options:</label>
-      {Object.keys(node.options).map((optionLabel) => (
-        <div key={optionLabel} className="mb-2">
-          <span className="font-semibold">{optionLabel}</span>
-          <ConversationNodeComponent
-            businessIndex={businessIndex}
-            node={node.options[optionLabel]}
-            onQuestionChange={onQuestionChange}
-            addOption={addOption}
-            path={[...path, optionLabel]} // Append the optionLabel to the path
-            isDarkMode={isDarkMode} // Pass dark mode to nested nodes
-          />
-        </div>
-      ))}
+      <label className="block font-bold mb-1">Answer:</label>
+      <input
+        type="text"
+        value={node.answer}
+        onChange={(e) => onAnswerChange(businessIndex, path, e.target.value)}
+        className="w-full p-2 border rounded-md mb-4"
+        placeholder="Enter Answer"
+      />
 
-      <div className="mb-4">
-        <label className="block font-bold mb-1">Add Options:</label>
+      <label className="block font-bold mb-1">Option Labels:</label>
+      <div className="flex mb-4">
         <input
           type="text"
-          value={option1}
-          onChange={(e) => setOption1(e.target.value)}
-          className="w-full p-2 border rounded-md mb-2"
-          placeholder="Option 1"
+          value={optionLabel1}
+          onChange={(e) => setOptionLabel1(e.target.value)}
+          className={`flex-1 p-2 border rounded-md mr-2 ${
+            isFirstOptionDisabled ? "bg-gray-300 cursor-not-allowed" : ""
+          }`}
+          placeholder="Enter Option Label 1"
+          disabled={isFirstOptionDisabled} // Disable if first option is disabled
         />
         <input
           type="text"
-          value={option2}
-          onChange={(e) => setOption2(e.target.value)}
-          className="w-full p-2 border rounded-md mb-2"
-          placeholder="Option 2"
+          value={optionLabel2}
+          onChange={(e) => setOptionLabel2(e.target.value)}
+          className="flex-1 p-2 border rounded-md mr-2"
+          placeholder="Enter Option Label 2"
         />
+        <button
+          onClick={() => {
+            handleAddOption(optionLabel1);
+            handleAddOption(optionLabel2);
+            // Note: option fields will not be reset
+          }}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+        >
+          Add Options
+        </button>
       </div>
 
-      <button
-        onClick={handleAddOptions}
-        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition flex items-center"
-      >
-        <FaPlus className="mr-1" /> Add Options
-      </button>
+      {/* Render options */}
+      <div className="mt-4">
+        {Object.keys(node.options).map((key) => (
+          <ConversationNodeComponent
+            key={key}
+            businessIndex={businessIndex}
+            node={node.options[key]}
+            onQuestionChange={onQuestionChange}
+            onAnswerChange={onAnswerChange}
+            addOption={addOption}
+            path={[...path, key]} // Update the path for child nodes
+            isDarkMode={isDarkMode}
+          />
+        ))}
+      </div>
     </div>
   );
 };

@@ -22,7 +22,7 @@ export const getReply = async (sessionId: string, message: string) => {
 };
 
 export const addBotConfiguration = async (data: any) => {
-  console.log("Data", data[0].name, data[0].conversationTree);
+  console.log("Data", data.name);
   const response = await axios.post(`${baseURL}/api/bot/config`, {
     business: data[0].name,
     conversationTree: data[0].conversationTree,
