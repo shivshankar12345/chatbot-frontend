@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import QuickOptions from "../components/QuickOptions"; // Ensure you have this component
 import { dummyConversationTree } from "../config/config";
+import { useNavigate } from "react-router-dom";
 
 interface Message {
   sender: string;
@@ -21,6 +22,7 @@ const dummyBusiness = {
 };
 
 const Chatbot: React.FC = () => {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentNode, setCurrentNode] = useState(
     dummyBusiness.conversationTree
@@ -84,14 +86,39 @@ const Chatbot: React.FC = () => {
         isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-800"
       }`}
     >
-      <header className="flex justify-between items-center p-4 border-b border-gray-300">
-        <h1 className="text-xl font-bold">{dummyBusiness.name}</h1>
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-          onClick={() => setIsDarkMode((prev) => !prev)}
-        >
-          Toggle Dark Mode
-        </button>
+      <header
+        className={`flex justify-between items-center p-4 shadow-lg rounded-t-xl transition duration-300 ${
+          isDarkMode
+            ? "bg-gray-800 border-b border-gray-700"
+            : "bg-gradient-to-r from-green-400 to-blue-500 border-b border-blue-400"
+        }`}
+      >
+        <h1 className="text-3xl font-extrabold tracking-widest text-center flex-grow">
+          {dummyBusiness.name}
+        </h1>
+
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setIsDarkMode((prev) => !prev)}
+            className={`p-2 rounded-full focus:outline-none transition-transform transform ${
+              isDarkMode
+                ? "hover:bg-gray-700"
+                : "hover:scale-110 hover:bg-blue-300"
+            }`}
+          >
+            {isDarkMode ? "🌞" : "🌙"}
+          </button>
+          <button
+            onClick={() => navigate("/admin")}
+            className={`px-4 py-2 rounded-full border-2 transition duration-300 ${
+              isDarkMode
+                ? "border-gray-600 bg-gray-800 text-white hover:bg-gray-700"
+                : "border-blue-500 bg-white text-blue-500 hover:bg-blue-100"
+            }`}
+          >
+            Configure
+          </button>
+        </div>
       </header>
 
       <div className="flex-grow mt-6 p-6 rounded-lg shadow-inner overflow-y-auto space-y-4">
