@@ -16,7 +16,7 @@ export interface ConversationNode {
   };
 }
 
-const Chatbot: React.FC = () => {
+const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentNode, setCurrentNode] = useState<ConversationNode | null>(null);
@@ -24,10 +24,14 @@ const Chatbot: React.FC = () => {
   const messageEndRef = useRef<HTMLDivElement | null>(null);
 
   const initializeConversation = () => {
-    // Fetch bot configuration
-    getBotConfiguration("Business1")
+    const businessName = localStorage.getItem('businessName');
+    if (!businessName) {
+      navigate('/'); 
+      return;
+    }
+    
+    getBotConfiguration(businessName)
       .then((res) => {
-        console.log("Conversation from backend", res.data);
         const initialNode = res.data.data;
         setCurrentNode(initialNode);
         setMessages([{ sender: "Chatbot", text: initialNode.question }]);
@@ -41,7 +45,6 @@ const Chatbot: React.FC = () => {
     initializeConversation();
   }, []);
 
-  // Ensure smooth scrolling
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -52,14 +55,11 @@ const Chatbot: React.FC = () => {
     if (!currentNode || !currentNode.options[optionKey]) return;
 
     const selectedOption = currentNode.options[optionKey];
-
-    // Add the user's selection to the messages
     setMessages((prev) => [
       ...prev,
       { sender: "User", text: selectedOption.question },
     ]);
 
-    // If there's an answer from the bot, add it to the messages
     if (selectedOption.answer) {
       setMessages((prev) => [
         ...prev,
@@ -69,20 +69,15 @@ const Chatbot: React.FC = () => {
         },
       ]);
 
-      // Check if there are more options for the next question
       if (Object.keys(selectedOption.options).length > 0) {
-        setCurrentNode(selectedOption); // Move to the next node
+        setCurrentNode(selectedOption);
       } else {
-        // No more options, alert the user and reset the conversation
         window.alert("No more options available. Restarting the conversation.");
-        initializeConversation(); // Reinitialize the conversation
+        initializeConversation(); 
       }
     } else {
-      // If there's no answer or options, alert and reset the conversation
-      window.alert(
-        "No further responses available. Restarting the conversation."
-      );
-      initializeConversation(); // Reset the conversation to the initial state
+      window.alert("No further responses available. Restarting the conversation.");
+      initializeConversation(); 
     }
   };
 
@@ -115,7 +110,7 @@ const Chatbot: React.FC = () => {
             {isDarkMode ? "🌞" : "🌙"}
           </button>
           <button
-            onClick={() => navigate("/admin/question-answers")}
+            onClick={() => navigate(`/chatbot/admin/${localStorage.getItem('businessName')}/question-answers`)}
             className={`px-4 py-2 rounded-full border-2 transition duration-300 ${
               isDarkMode
                 ? "border-gray-600 bg-gray-800 text-white hover:bg-gray-700"
@@ -145,7 +140,6 @@ const Chatbot: React.FC = () => {
         <div ref={messageEndRef}></div>
       </div>
 
-      {/* QuickOptions Section */}
       {currentNode && (
         <QuickOptions
           features={Object.keys(currentNode.options).map((key) => ({
@@ -160,4 +154,4 @@ const Chatbot: React.FC = () => {
   );
 };
 
-export default Chatbot;
+export default HomePage;
