@@ -10,12 +10,12 @@ import Reports from "../pages/Reports";
 const AdminRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="/*" element={<AdminLayout />}>
+      <Route path="/" element={<AdminLayout />}>
         <Route path="business" element={<BusinessList />} />
-        <Route path="business/overview/:id" element={<BusinessPage/>} />
-        <Route path="question-answers" element={<QAPage/>}/>
-        <Route path ="settings" element ={<Settings/>}/>
-        <Route path="reports" element={<Reports/>}/>
+        <Route path="business/overview/:id" element={<BusinessPage />} />
+        <Route path="question-answers" element={<QAPage />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="reports" element={<Reports />} />
       </Route>
     </Routes>
   );
