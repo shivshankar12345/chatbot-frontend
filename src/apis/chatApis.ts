@@ -30,3 +30,10 @@ export const addBotConfiguration = async (data: any) => {
 
   return response;
 };
+
+//Business 1
+export const getBotConfiguration = async (business: string = "Business1") => {
+  const response = await axios.get(`${baseURL}/api/bot/${business}`);
+
+  return response;
+};

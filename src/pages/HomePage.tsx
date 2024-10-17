@@ -1,84 +1,88 @@
 import React, { useState, useEffect, useRef } from "react";
 import QuickOptions from "../components/QuickOptions"; // Ensure you have this component
-import { dummyConversationTree } from "../config/config";
 import { useNavigate } from "react-router-dom";
+import { getBotConfiguration } from "../apis/chatApis";
 
 interface Message {
   sender: string;
-  text: string;
+  text: string | undefined;
 }
 
 export interface ConversationNode {
   question: string;
-  answer: string; // Added answer field
+  answer?: string;
   options: {
     [key: string]: ConversationNode;
   };
 }
 
-const dummyBusiness = {
-  name: "My Business",
-  conversationTree: dummyConversationTree,
-};
-
-
 const Chatbot: React.FC = () => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [currentNode, setCurrentNode] = useState(
-    dummyBusiness.conversationTree
-  );
+  const [currentNode, setCurrentNode] = useState<ConversationNode | null>(null);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const messageEndRef = useRef<HTMLDivElement | null>(null);
+
+  const initializeConversation = () => {
+    // Fetch bot configuration
+    getBotConfiguration("Business1")
+      .then((res) => {
+        console.log("Conversation from backend", res.data);
+        const initialNode = res.data.data;
+        setCurrentNode(initialNode);
+        setMessages([{ sender: "Chatbot", text: initialNode.question }]);
+      })
+      .catch((error) => {
+        console.log("Error", error);
+      });
+  };
+
   useEffect(() => {
-    setMessages([
-      { sender: "Chatbot", text: dummyBusiness.conversationTree.question },
-    ]);
+    initializeConversation();
   }, []);
-   useEffect(()=>{
-    messageEndRef.current?.scrollIntoView({behavior:"smooth"})
-   },[messages]);
+
+  // Ensure smooth scrolling
+  useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
   const handleOptionClick = (optionKey: string) => {
+    if (!currentNode || !currentNode.options[optionKey]) return;
+
     const selectedOption = currentNode.options[optionKey];
 
-    if (selectedOption) {
-      // Add the user's selection
+    // Add the user's selection to the messages
+    setMessages((prev) => [
+      ...prev,
+      { sender: "User", text: selectedOption.question },
+    ]);
+
+    // If there's an answer from the bot, add it to the messages
+    if (selectedOption.answer) {
       setMessages((prev) => [
         ...prev,
-        { sender: "User", text: selectedOption.question },
+        {
+          sender: "Chatbot",
+          text: selectedOption.answer ?? "No response available",
+        },
       ]);
 
-      // Add the bot's answer for the selected option
-      setMessages((prev) => [
-        ...prev,
-        { sender: "Chatbot", text: selectedOption.answer },
-      ]);
-
-      // If the selected option has further questions, present the next one
-      const nextOptionKeys = Object.keys(selectedOption.options);
-      if (nextOptionKeys.length > 0) {
-        const nextQuestion = selectedOption.options[nextOptionKeys[0]].question;
-        setMessages((prev) => [
-          ...prev,
-          { sender: "Chatbot", text: nextQuestion },
-        ]);
-        // Update the current node to the selected option
-        setCurrentNode(selectedOption);
+      // Check if there are more options for the next question
+      if (Object.keys(selectedOption.options).length > 0) {
+        setCurrentNode(selectedOption); // Move to the next node
       } else {
-        // If no more options are left, go back to the start
-        alert("No more options available. Returning to the start...");
-        setCurrentNode(dummyBusiness.conversationTree);
-        setMessages([
-          { sender: "Chatbot", text: dummyBusiness.conversationTree.question },
-        ]);
+        // No more options, alert the user and reset the conversation
+        window.alert("No more options available. Restarting the conversation.");
+        initializeConversation(); // Reinitialize the conversation
       }
     } else {
-      // If no more options are left, go back to the start
-      alert("No more options available. Returning to the start...");
-      setCurrentNode(dummyBusiness.conversationTree);
-      setMessages([
-        { sender: "Chatbot", text: dummyBusiness.conversationTree.question },
-      ]);
+      // If there's no answer or options, alert and reset the conversation
+      window.alert(
+        "No further responses available. Restarting the conversation."
+      );
+      initializeConversation(); // Reset the conversation to the initial state
     }
   };
 
@@ -96,7 +100,7 @@ const Chatbot: React.FC = () => {
         }`}
       >
         <h1 className="text-3xl font-extrabold tracking-widest text-center flex-grow">
-          {dummyBusiness.name}
+          Chatbot
         </h1>
 
         <div className="flex items-center space-x-2">
@@ -123,7 +127,10 @@ const Chatbot: React.FC = () => {
         </div>
       </header>
 
-      <div className="flex-grow mt-6 p-6 rounded-lg shadow-inner overflow-y-auto space-y-4" id="messageContainer">
+      <div
+        className="flex-grow mt-6 p-6 rounded-lg shadow-inner overflow-y-auto space-y-4"
+        id="messageContainer"
+      >
         {messages.map((message, index) => (
           <div
             key={index}
@@ -139,14 +146,16 @@ const Chatbot: React.FC = () => {
       </div>
 
       {/* QuickOptions Section */}
-      <QuickOptions
-        features={Object.keys(currentNode.options).map((key) => ({
-          id: key,
-          text: currentNode.options[key].question,
-        }))}
-        isDarkMode={isDarkMode}
-        onOptionClick={handleOptionClick}
-      />
+      {currentNode && (
+        <QuickOptions
+          features={Object.keys(currentNode.options).map((key) => ({
+            id: key,
+            text: currentNode.options[key].question,
+          }))}
+          isDarkMode={isDarkMode}
+          onOptionClick={handleOptionClick}
+        />
+      )}
     </div>
   );
 };
