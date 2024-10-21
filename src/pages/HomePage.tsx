@@ -86,7 +86,7 @@ const HomePage: React.FC = () => {
   return (
     <div
       className={`flex flex-col h-screen w-screen transition-all ${
-        isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-800"
+        isDarkMode ? "bg-gray-900 text-black" : "bg-white text-gray-800"
       }`}
     >
       <header
