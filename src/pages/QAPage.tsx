@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaSave, FaSun, FaMoon } from "react-icons/fa";
 import { addBotConfiguration } from "../apis/chatApis";
 import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 interface ConversationNode {
   question: string;
@@ -16,6 +17,7 @@ interface Business {
 
 const ChatbotQAAdmin: React.FC = () => {
   const navigate = useNavigate();
+  const { businessName } = useParams();
   const [businesses, setBusinesses] = useState<Business[]>([
     { name: "", conversationTree: { question: "", options: {} } },
   ]);
@@ -133,15 +135,16 @@ const ChatbotQAAdmin: React.FC = () => {
           }`}
         >
           <div className="mb-4">
-            <label className="block font-bold mb-1">Business Name:</label>
+            <label className="block font-bold mb-1 ">Business Name :</label>
             <input
               type="text"
-              value={business.name}
+              value={businessName}
               onChange={(e) =>
                 handleBusinessChange(businessIndex, e.target.value)
               }
-              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed"
               placeholder="Enter Business Name"
+              disabled
             />
           </div>
 

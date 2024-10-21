@@ -31,7 +31,9 @@ const FormPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center  min-h-screen bg-gray-100">
-      <h2>Previously configured Businesses for demo</h2>
+      <h2 className="text-xl font-semibold text-center mb-4 text-gray-800">
+        Previously configured Businesses for demo
+      </h2>
       <div className="flex flex-row items-center justify-center">
         {businessFromDB.map((item, index) => (
           <div
@@ -41,7 +43,7 @@ const FormPage = () => {
               localStorage.setItem("businessName", item);
               navigate(`/chatbot/user/${item}`);
             }}
-            className="p-4 m-2 bg-gray-200 rounded-md mb-2 shadow-md"
+            className="p-4 m-2 bg-gray-200 rounded-md mb-2 shadow-md cursor-pointer"
           >
             {item}
           </div>
