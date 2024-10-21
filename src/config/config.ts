@@ -1,6 +1,6 @@
 import { ConversationNode } from "../pages/HomePage";
 
-export const baseURL = "http://localhost:4000";
+export const baseURL = "http://13.201.20.76:4000";
 export const features = [
   {
     id: 1,
