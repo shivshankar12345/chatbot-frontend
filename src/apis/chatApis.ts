@@ -22,7 +22,6 @@ export const getReply = async (sessionId: string, message: string) => {
 };
 
 export const addBotConfiguration = async (data: any) => {
-  console.log("Data", data.name);
   const response = await axios.post(`${baseURL}/api/bot/config`, {
     business: data[0].name,
     conversationTree: data[0].conversationTree,
@@ -33,7 +32,15 @@ export const addBotConfiguration = async (data: any) => {
 
 //Business 1
 export const getBotConfiguration = async (business: string = "Business1") => {
-  const response = await axios.get(`${baseURL}/api/bot/${business}`);
+  const response = await axios.get(`${baseURL}/api/bot/business/${business}`);
+
+  return response;
+};
+
+//Get Initial Businesses
+
+export const getBusinesses = async () => {
+  const response = await axios.get(`${baseURL}/api/bot/getBusiness`);
 
   return response;
 };

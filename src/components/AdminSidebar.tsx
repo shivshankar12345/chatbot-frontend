@@ -1,9 +1,15 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { FaTachometerAlt, FaCogs, FaChartBar, FaSignOutAlt, FaQuestionCircle } from 'react-icons/fa';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import {
+  FaTachometerAlt,
+  // FaCogs,
+  FaChartBar,
+  FaSignOutAlt,
+  FaQuestionCircle,
+} from "react-icons/fa";
 
 const AdminSidebar: React.FC = () => {
-  const businessName = localStorage.getItem('businessName');
+  const businessName = localStorage.getItem("businessName");
 
   return (
     <div className="h-[150%] w-64 bg-gray-900 text-white flex flex-col justify-between shadow-lg">
@@ -17,9 +23,15 @@ const AdminSidebar: React.FC = () => {
         <ul>
           {/* Business Link */}
           <li className="p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
-            <NavLink 
-              to={businessName ? `/chatbot/admin/${businessName}/business` : "/"} 
-              className={({ isActive }) => (isActive ? "text-blue-400 font-semibold flex items-center" : "text-white flex items-center")}
+            <NavLink
+              to={
+                businessName ? `/chatbot/admin/${businessName}/business` : "/"
+              }
+              className={({ isActive }) =>
+                isActive
+                  ? "text-blue-400 font-semibold flex items-center"
+                  : "text-white flex items-center"
+              }
             >
               <FaTachometerAlt className="mr-3 text-xl" />
               Business
@@ -28,9 +40,17 @@ const AdminSidebar: React.FC = () => {
 
           {/* Question-Answer Link */}
           <li className="p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
-            <NavLink 
-              to={businessName ? `/chatbot/admin/${businessName}/question-answers` : "/"} 
-              className={({ isActive }) => (isActive ? "text-blue-400 font-semibold flex items-center" : "text-white flex items-center")}
+            <NavLink
+              to={
+                businessName
+                  ? `/chatbot/admin/${businessName}/question-answers`
+                  : "/"
+              }
+              className={({ isActive }) =>
+                isActive
+                  ? "text-blue-400 font-semibold flex items-center"
+                  : "text-white flex items-center"
+              }
             >
               <FaQuestionCircle className="mr-3 text-xl" />
               Question-Answer
@@ -38,7 +58,7 @@ const AdminSidebar: React.FC = () => {
           </li>
 
           {/* Settings Link */}
-          <li className="p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
+          {/* <li className="p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
             <NavLink 
               to="/admin/settings" 
               className={({ isActive }) => (isActive ? "text-blue-400 font-semibold flex items-center" : "text-white flex items-center")}
@@ -46,13 +66,17 @@ const AdminSidebar: React.FC = () => {
               <FaCogs className="mr-3 text-xl" />
               Settings
             </NavLink>
-          </li>
+          </li> */}
 
           {/* Reports Link */}
           <li className="p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
-            <NavLink 
-              to={businessName ? `/chatbot/admin/${businessName}/reports` : "/"}  
-              className={({ isActive }) => (isActive ? "text-blue-400 font-semibold flex items-center" : "text-white flex items-center")}
+            <NavLink
+              to={businessName ? `/chatbot/admin/${businessName}/reports` : "/"}
+              className={({ isActive }) =>
+                isActive
+                  ? "text-blue-400 font-semibold flex items-center"
+                  : "text-white flex items-center"
+              }
             >
               <FaChartBar className="mr-3 text-xl" />
               Reports
@@ -61,9 +85,13 @@ const AdminSidebar: React.FC = () => {
 
           {/* User Management Link */}
           <li className="p-4 hover:bg-gray-700 cursor-pointer transition duration-200 rounded-lg">
-            <NavLink 
-              to="/" 
-              className={({ isActive }) => (isActive ? "text-blue-400 font-semibold flex items-center" : "text-white flex items-center")}
+            <NavLink
+              to={`/chatbot/user/${localStorage.getItem("businessName")}`}
+              className={({ isActive }) =>
+                isActive
+                  ? "text-blue-400 font-semibold flex items-center"
+                  : "text-white flex items-center"
+              }
             >
               <FaSignOutAlt className="mr-3 text-xl" />
               Go Back to Home
@@ -74,15 +102,12 @@ const AdminSidebar: React.FC = () => {
 
       {/* Footer Section */}
       <div className="p-4 border-t border-gray-700">
-        <p className="text-center text-sm opacity-70">© 2024 Chatbot Application</p>
+        <p className="text-center text-sm opacity-70">
+          © 2024 Chatbot Application
+        </p>
       </div>
     </div>
   );
 };
 
 export default AdminSidebar;
-
-
-
-
-

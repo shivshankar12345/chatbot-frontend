@@ -24,12 +24,12 @@ const HomePage: React.FC = () => {
   const messageEndRef = useRef<HTMLDivElement | null>(null);
 
   const initializeConversation = () => {
-    const businessName = localStorage.getItem('businessName');
+    const businessName = localStorage.getItem("businessName");
     if (!businessName) {
-      navigate('/'); 
+      navigate("/");
       return;
     }
-    
+
     getBotConfiguration(businessName)
       .then((res) => {
         const initialNode = res.data.data;
@@ -73,11 +73,13 @@ const HomePage: React.FC = () => {
         setCurrentNode(selectedOption);
       } else {
         window.alert("No more options available. Restarting the conversation.");
-        initializeConversation(); 
+        initializeConversation();
       }
     } else {
-      window.alert("No further responses available. Restarting the conversation.");
-      initializeConversation(); 
+      window.alert(
+        "No further responses available. Restarting the conversation."
+      );
+      initializeConversation();
     }
   };
 
@@ -110,7 +112,13 @@ const HomePage: React.FC = () => {
             {isDarkMode ? "🌞" : "🌙"}
           </button>
           <button
-            onClick={() => navigate(`/chatbot/admin/${localStorage.getItem('businessName')}/question-answers`)}
+            onClick={() =>
+              navigate(
+                `/chatbot/admin/${localStorage.getItem(
+                  "businessName"
+                )}/question-answers`
+              )
+            }
             className={`px-4 py-2 rounded-full border-2 transition duration-300 ${
               isDarkMode
                 ? "border-gray-600 bg-gray-800 text-white hover:bg-gray-700"
@@ -118,6 +126,16 @@ const HomePage: React.FC = () => {
             }`}
           >
             Configure
+          </button>
+          <button
+            onClick={() => navigate(`/`)}
+            className={`px-4 py-2 rounded-full border-2 transition duration-300 ${
+              isDarkMode
+                ? "border-gray-600 bg-gray-800 text-white hover:bg-gray-700"
+                : "border-blue-500 bg-white text-blue-500 hover:bg-blue-100"
+            }`}
+          >
+            Main Page
           </button>
         </div>
       </header>
