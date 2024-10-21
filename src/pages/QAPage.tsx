@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaSave, FaSun, FaMoon } from "react-icons/fa";
 import { addBotConfiguration } from "../apis/chatApis";
 import { useNavigate } from "react-router-dom";
@@ -100,6 +100,14 @@ const ChatbotQAAdmin: React.FC = () => {
       });
   };
 
+  useEffect(() => {
+    setBusinesses([
+      {
+        name: businessName as string,
+        conversationTree: { question: "", options: {} },
+      },
+    ]);
+  }, []);
   return (
     <div
       className={`p-6 rounded-lg shadow-lg transition-all w-full h-full ${
